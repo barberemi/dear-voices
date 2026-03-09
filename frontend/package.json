@@ -13,6 +13,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:widget": "VITE_BUILD_TARGET=widget vite build",
     "preview": "vite preview"
   }
 }

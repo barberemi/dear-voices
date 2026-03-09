@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Widget DearVoices</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 0 20px;
+      background: #f5f5f5;
+      color: #333;
+    }
+    h1 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+    p  { color: #666; margin-bottom: 2rem; line-height: 1.6; }
+    .instructions {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.85rem;
+      margin-bottom: 2rem;
+    }
+    .instructions code {
+      background: #eee;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Page de test – Widget DearVoices</h1>
+
+  <div class="instructions">
+    <strong>⚠️ Avant de tester :</strong><br/>
+    1. Lance le backend : <code>make up</code> ou <code>make dev-backend</code><br/>
+    2. Génère un audio depuis <a href="http://localhost:3000" target="_blank">localhost:3000</a><br/>
+    3. Remplace <code>TON_FICHIER.wav</code> ci-dessous par le vrai nom du fichier généré<br/>
+    4. Ouvre ce fichier dans ton navigateur (ou via <code>npx serve .</code>)
+  </div>
+
+  <p>
+    Voici un exemple de texte déjà présent sur la page d'un client.
+    Le widget DearVoices s'insère juste en dessous, sans aucun framework requis.
+  </p>
+
+  <!-- ✅ C'EST ICI QUE LE WIDGET S'INTÈGRE -->
+  <!-- Remplace TON_FICHIER.wav par le nom réel (ex: output_a1b2c3d4.wav) -->
+  <!-- Le widget est servi par "make test-widget" sur le port 4000 -->
+  <script src="http://localhost:4000/widget.iife.js?id=output_803b790a.wav&api=http://localhost:8000"></script>
+
+  <p style="margin-top: 2rem; color: #999; font-size: 0.85rem;">
+    La suite du contenu de la page continue normalement ici.
+  </p>
+</body>
+</html>

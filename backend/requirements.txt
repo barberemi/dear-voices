@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+TTS==0.22.0
+torch==2.3.1
+torchaudio==2.3.1
+transformers==4.40.2
+soundfile
+librosa
+pydub
+python-multipart

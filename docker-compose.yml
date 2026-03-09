@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+  # ─────────────────────────────────────────
+  # BACKEND  –  FastAPI + XTTS v2
+  # ─────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dearvoices_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app                                             # Hot-reload en dev (--reload actif)
+      - ./backend/uploads:/app/uploads                            # Voix uploadées (visible localement)
+      - ./backend/outputs:/app/outputs                            # Audios générés (visible localement)
+      - /home/rbarbe/.local/share/tts:/root/.local/share/tts:ro          # Coqui TTS models (~2GB)
+      - /home/rbarbe/.cache/huggingface:/root/.cache/huggingface:ro       # Hugging Face models
+      - /home/rbarbe/.cache/torch:/root/.cache/torch:ro                   # PyTorch hub models
+    environment:
+      - PYTHONUNBUFFERED=1
+    # Décommente les lignes suivantes si tu as un GPU NVIDIA
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    networks:
+      - dearvoices_net
+
+  # ─────────────────────────────────────────
+  # FRONTEND  –  React (build) servi par Nginx
+  # ─────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dearvoices_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - dearvoices_net
+
+# ─────────────────────────────────────────
+# VOLUMES persistants
+# ─────────────────────────────────────────
+# Les uploads et outputs sont maintenant des bind mounts (./backend/uploads et ./backend/outputs)
+# Plus besoin de volumes nommés pour ces dossiers.
+
+# ─────────────────────────────────────────
+# RÉSEAU interne
+# ─────────────────────────────────────────
+networks:
+  dearvoices_net:
+    driver: bridge

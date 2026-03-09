@@ -1,0 +1,116 @@
+.recorder {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.recorder-controls {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn--record {
+  background: linear-gradient(135deg, #a78bfa, #7c3aed);
+  color: #fff;
+}
+
+.btn--stop {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  color: #fff;
+}
+
+.btn--generate {
+  background: linear-gradient(135deg, #60a5fa, #2563eb);
+  color: #fff;
+  width: 100%;
+  justify-content: center;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.btn-icon { font-size: 1rem; }
+
+/* WAVEFORM ANIMATION */
+.recording-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(167, 139, 250, 0.07);
+  border-radius: 10px;
+}
+
+.recording-hint p {
+  font-size: 0.82rem;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.waveform {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 36px;
+}
+
+.waveform-bar {
+  width: 4px;
+  background: #a78bfa;
+  border-radius: 2px;
+  animation: wave 0.8s ease-in-out infinite alternate;
+  min-height: 4px;
+}
+
+@keyframes wave {
+  from { height: 6px; opacity: 0.4; }
+  to   { height: 32px; opacity: 1; }
+}
+
+@keyframes pulse-anim {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse { animation: pulse-anim 1s ease-in-out infinite; }
+
+/* STATUS */
+.status-msg {
+  font-size: 0.85rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.status-msg--loading {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+}
+
+.status-msg--success {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+}
+
+.status-msg--error {
+  background: rgba(248, 113, 113, 0.1);
+  color: #f87171;
+}

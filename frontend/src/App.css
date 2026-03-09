@@ -1,0 +1,109 @@
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f13 0%, #1a1a2e 50%, #16213e 100%);
+}
+
+/* HEADER */
+.app-header {
+  text-align: center;
+  padding: 3rem 1rem 1.5rem;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.logo-icon {
+  font-size: 2rem;
+}
+
+.logo-text strong {
+  font-weight: 700;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tagline {
+  color: #6b7280;
+  font-size: 0.95rem;
+  font-weight: 300;
+}
+
+/* MAIN */
+.app-main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* CARDS */
+.card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.card--active {
+  border-color: rgba(167, 139, 250, 0.4);
+  box-shadow: 0 0 30px rgba(167, 139, 250, 0.08);
+}
+
+.card--done {
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.card--player {
+  border-color: rgba(96, 165, 250, 0.4);
+  box-shadow: 0 0 30px rgba(96, 165, 250, 0.08);
+}
+
+.card--disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.step-badge {
+  min-width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.card-header h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.2rem;
+}
+
+.card-subtitle {
+  font-size: 0.82rem;
+  color: #6b7280;
+  line-height: 1.4;
+}

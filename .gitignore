@@ -1,0 +1,16 @@
+# Fichiers audio générés
+backend/uploads/
+backend/outputs/
+ma_voix.wav
+output.wav
+
+# Python
+__pycache__/
+*.pyc
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Env
+.env

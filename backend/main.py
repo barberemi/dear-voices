@@ -113,6 +113,31 @@ async def generate_voice(text: str = Form(...), language: str = Form("fr")):
     })
 
 
+@app.get("/share/{filename}")
+def share_audio(filename: str):
+    """
+    Retourne les métadonnées publiques d'un audio généré.
+    Utilisé par le widget JS embarquable.
+    """
+    file_path = os.path.join(OUTPUT_DIR, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Audio introuvable.")
+    import wave
+    try:
+        with wave.open(file_path, 'r') as wf:
+            frames = wf.getnframes()
+            rate = wf.getframerate()
+            duration = round(frames / float(rate), 2)
+    except Exception:
+        duration = 0
+
+    return JSONResponse({
+        "filename": filename,
+        "audio_url": f"/audio/{filename}",
+        "duration": duration,
+    })
+
+
 @app.get("/audio/{filename}")
 def get_audio(filename: str):
     """

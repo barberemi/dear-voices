@@ -1,5 +1,6 @@
 .PHONY: help build up down restart logs logs-backend logs-frontend \
-        dev-backend dev-frontend install-frontend clean prune shell-backend
+        dev-backend dev-frontend install-frontend clean prune shell-backend \
+        rebuild rebuild-backend test-widget
 
 # Couleurs
 CYAN  := \033[36m
@@ -38,6 +39,12 @@ rebuild-backend: ## 🔁 Rebuild uniquement le backend (si requirements.txt a ch
 	docker compose build backend
 	docker compose up -d --no-deps backend
 
+test-widget: ## � Build le widget et le sert en local sur :4000
+	cd frontend && npm run build:widget
+	@echo "$(CYAN)Serveur widget sur http://localhost:4000$(RESET)"
+	@echo ""
+	cd frontend/dist-widget && npx --yes serve . -p 4000
+
 # ─────────────────────────────────────────
 # LOGS
 # ─────────────────────────────────────────
@@ -61,7 +68,7 @@ install-frontend: ## 📦 Installe les dépendances npm du frontend
 dev-frontend: ## ⚡ Lance le serveur de dev Vite (hot reload, exposé sur le réseau)
 	cd frontend && npm run dev -- --host
 
-dev-backend: ## 🐍 Lance FastAPI en local (sans Docker)
+dev-backend: ## 🐍 Lance FastAPI en local (sans Docker) & chec /docs swagger
 	cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
 dev: ## 🧪 Lance backend + frontend en dev (2 terminaux parallèles)

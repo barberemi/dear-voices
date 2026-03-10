@@ -1,13 +1,19 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './AudioPlayer.css';
 
-export default function AudioPlayer({ src, filename }) {
+export default function AudioPlayer({ src, filename, apiUrl }) {
   const audioRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const progressBarRef = useRef(null);
+  const [copied, setCopied] = useState(false);
+
+  // Construit le tag <script> prêt à intégrer sur un site externe
+  const widgetApiUrl = apiUrl || 'http://localhost:8000';
+  const widgetSrc = `${widgetApiUrl}/widget/widget.iife.js`;
+  const embedCode = `<script src="${widgetSrc}?id=${filename}&api=${widgetApiUrl}"></script>`;
 
   useEffect(() => {
     // Quand une nouvelle source arrive, on remet à zéro
@@ -64,6 +70,13 @@ export default function AudioPlayer({ src, filename }) {
     return `${m}:${String(sec).padStart(2, '0')}`;
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(embedCode).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   return (
     <div className="player">
       <audio
@@ -108,6 +121,23 @@ export default function AudioPlayer({ src, filename }) {
       >
         ⬇ Télécharger le fichier WAV
       </a>
+
+      {/* ─── Encart "Intégrer sur mon site" ─── */}
+      <div className="embed-block">
+        <div className="embed-block__header">
+          <span>🌐 Intégrer ce player sur ton site</span>
+          <button
+            className={`copy-btn ${copied ? 'copy-btn--done' : ''}`}
+            onClick={handleCopy}
+          >
+            {copied ? '✓ Copié !' : '📋 Copier'}
+          </button>
+        </div>
+        <pre className="embed-block__code">{embedCode}</pre>
+        <p className="embed-block__hint">
+          Colle ce code HTML là où tu veux afficher le player sur ton site.
+        </p>
+      </div>
     </div>
   );
 }

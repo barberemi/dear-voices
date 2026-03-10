@@ -16,9 +16,10 @@ services:
       - ./backend:/app                                             # Hot-reload en dev (--reload actif)
       - ./backend/uploads:/app/uploads                            # Voix uploadées (visible localement)
       - ./backend/outputs:/app/outputs                            # Audios générés (visible localement)
-      - /home/rbarbe/.local/share/tts:/root/.local/share/tts:ro          # Coqui TTS models (~2GB)
-      - /home/rbarbe/.cache/huggingface:/root/.cache/huggingface:ro       # Hugging Face models
-      - /home/rbarbe/.cache/torch:/root/.cache/torch:ro                   # PyTorch hub models
+      - /home/rbarbe/.local/share/tts:/root/.local/share/tts:ro                          # Coqui TTS models (~2GB)
+      - /home/rbarbe/.cache/huggingface:/root/.cache/huggingface:ro                      # Hugging Face models
+      - /home/rbarbe/.cache/torch:/root/.cache/torch:ro                                  # PyTorch hub models
+      - /home/rbarbe/.local/share/dearvoices/pip-packages:/usr/local/lib/python3.10/dist-packages:ro  # Packages pip (~7GB, évite le réinstall)
     environment:
       - PYTHONUNBUFFERED=1
     # Décommente les lignes suivantes si tu as un GPU NVIDIA

@@ -30,7 +30,9 @@ export default function App() {
   };
 
   const handleAudioGenerated = (url, filename) => {
-    setAudioUrl(url);
+    // On construit une URL absolue vers le backend pour que le téléchargement fonctionne
+    const absoluteUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+    setAudioUrl(absoluteUrl);
     setAudioFilename(filename);
   };
 

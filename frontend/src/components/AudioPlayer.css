@@ -105,3 +105,65 @@
 .download-btn:hover {
   background: rgba(96, 165, 250, 0.1);
 }
+
+/* ─── ENCART INTÉGRATION ─── */
+.embed-block {
+  margin-top: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.embed-block__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+.copy-btn {
+  font-size: 0.78rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  background: transparent;
+  color: #a78bfa;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.copy-btn:hover {
+  background: rgba(167, 139, 250, 0.15);
+}
+
+.copy-btn--done {
+  color: #34d399;
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.embed-block__code {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 6px;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 0.72rem;
+  color: #93c5fd;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.5;
+  border: 1px solid rgba(96, 165, 250, 0.15);
+}
+
+.embed-block__hint {
+  margin: 0;
+  font-size: 0.72rem;
+  color: #6b7280;
+  line-height: 1.4;
+}

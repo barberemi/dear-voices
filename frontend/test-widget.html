@@ -50,10 +50,12 @@
   <!-- ✅ C'EST ICI QUE LE WIDGET S'INTÈGRE -->
   <!-- Remplace TON_FICHIER.wav par le nom réel (ex: output_a1b2c3d4.wav) -->
   <!-- Le widget est servi par "make test-widget" sur le port 4000 -->
+
+  <p style="margin-top: 1rem; font-size: 0.9rem; color: #555;"><strong>Sans pub :</strong></p>
   <script src="http://localhost:4000/widget.iife.js?id=output_803b790a.wav&api=http://localhost:8000"></script>
 
-  <p style="margin-top: 2rem; color: #999; font-size: 0.85rem;">
-    La suite du contenu de la page continue normalement ici.
-  </p>
+  <p style="margin-top: 1.5rem; font-size: 0.9rem; color: #555;"><strong>Avec VAST pre-roll (remplace l'URL vast= par ton tag) :</strong></p>
+  <script src="http://localhost:4000/widget.iife.js?id=output_803b790a.wav&api=http://localhost:8000&vast=http://localhost:8000/test-vast"></script>
+
 </body>
 </html>

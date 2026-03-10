@@ -13,7 +13,11 @@ export default function AudioPlayer({ src, filename, apiUrl }) {
   // Construit le tag <script> prêt à intégrer sur un site externe
   const widgetApiUrl = apiUrl || 'http://localhost:8000';
   const widgetSrc = `${widgetApiUrl}/widget/widget.iife.js`;
-  const embedCode = `<script src="${widgetSrc}?id=${filename}&api=${widgetApiUrl}"></script>`;
+  const embedCode = `<!-- Sans publicité -->
+<script src="${widgetSrc}?id=${filename}&api=${widgetApiUrl}"></script>
+
+<!-- Avec VAST pre-roll (remplace l'URL vast=) -->
+<script src="${widgetSrc}?id=${filename}&api=${widgetApiUrl}&vast=https://ton-adserver.com/vast.xml"></script>`;
 
   useEffect(() => {
     // Quand une nouvelle source arrive, on remet à zéro

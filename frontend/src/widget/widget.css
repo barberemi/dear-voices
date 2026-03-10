@@ -37,17 +37,14 @@
 .dv-play:active { transform: scale(0.95); }
 .dv-play svg { width: 16px; height: 16px; }
 
-/* SPINNER */
-.dv-spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: dv-spin 0.7s linear infinite;
-  display: inline-block;
+/* Bouton désactivé pendant la pub */
+.dv-play--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: linear-gradient(135deg, #fb923c, #f59e0b);
+  box-shadow: 0 2px 10px rgba(251,146,60,0.3);
 }
-@keyframes dv-spin { to { transform: rotate(360deg); } }
+.dv-play--disabled:hover { transform: none; }
 
 /* RIGHT SECTION */
 .dv-right {
@@ -109,3 +106,60 @@
   flex-shrink: 0;
 }
 .dv-brand:hover { opacity: 0.9; }
+
+/* ─── VAST AD ─────────────────────────────────────────────────── */
+
+/* Légère teinte orange quand la pub joue */
+.dv-widget--ad {
+  border-color: rgba(251, 146, 60, 0.45);
+  box-shadow: 0 4px 20px rgba(251, 146, 60, 0.15);
+}
+
+/* Barre de progression de la pub */
+.dv-ad-overlay {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.dv-ad-bar {
+  position: relative;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.dv-ad-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #fb923c, #f59e0b);
+  border-radius: 2px;
+  transition: width 0.25s linear;
+}
+
+/* Ligne "Publicité – Xs" */
+.dv-ad-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.62rem;
+}
+
+.dv-ad-badge {
+  color: #fb923c;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.dv-ad-link {
+  color: #fb923c;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dv-ad-remaining {
+  color: #9ca3af;
+  font-variant-numeric: tabular-nums;
+}

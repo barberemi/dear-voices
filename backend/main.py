@@ -3,7 +3,7 @@ import uuid
 import torch
 import soundfile as sf
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydub import AudioSegment
 
@@ -156,3 +156,42 @@ def voice_status():
     """
     voice_path = os.path.join(UPLOAD_DIR, VOICE_FILENAME)
     return {"has_voice": os.path.exists(voice_path)}
+
+# VAST test part
+@app.get("/test-vast")
+def test_vast():
+    """Faux tag VAST pour tester le pre-roll audio en local."""
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
+<VAST version="3.0">
+  <Ad id="test-ad-001">
+    <InLine>
+      <AdSystem>DearVoices Test</AdSystem>
+      <AdTitle>Test Pre-Roll</AdTitle>
+      <Impression><![CDATA[http://localhost:8000/vast-ping?event=impression]]></Impression>
+      <Creatives>
+        <Creative>
+          <Linear skipoffset="00:00:10">
+            <Duration>00:00:15</Duration>
+            <TrackingEvents>
+              <Tracking event="start"><![CDATA[http://localhost:8000/vast-ping?event=start]]></Tracking>
+              <Tracking event="skip"><![CDATA[http://localhost:8000/vast-ping?event=skip]]></Tracking>
+              <Tracking event="complete"><![CDATA[http://localhost:8000/vast-ping?event=complete]]></Tracking>
+            </TrackingEvents>
+            <MediaFiles>
+              <MediaFile type="audio/mpeg" delivery="progressive">
+                <![CDATA[https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3]]>
+              </MediaFile>
+            </MediaFiles>
+          </Linear>
+        </Creative>
+      </Creatives>
+    </InLine>
+  </Ad>
+</VAST>"""
+    return Response(content=xml, media_type="application/xml")
+
+@app.get("/vast-ping")
+def vast_ping(event: str = ""):
+    """Reçoit les events de tracking VAST (impression, start, complete…)"""
+    print(f"[VAST TRACKING] event={event}")
+    return Response(status_code=204)

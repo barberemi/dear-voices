@@ -12,11 +12,12 @@ function getScriptParams() {
     id:    url.searchParams.get('id')    || '',
     title: url.searchParams.get('title') || '',
     api:   url.searchParams.get('api')   || 'http://localhost:8000',
+    vast:  url.searchParams.get('vast')  || '',   // ← tag VAST optionnel
   };
 }
 
 async function mount() {
-  const { id, title, api } = getScriptParams();
+  const { id, title, api, vast } = getScriptParams();
   if (!id) {
     console.warn('[DearVoices widget] Paramètre ?id= manquant.');
     return;
@@ -55,6 +56,7 @@ async function mount() {
       audioUrl={`${api}/audio/${id}`}
       title={title}
       duration={duration}
+      vastUrl={vast}
     />
   );
 }

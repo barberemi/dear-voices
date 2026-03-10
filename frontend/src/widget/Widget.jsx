@@ -86,6 +86,7 @@ export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
   const showAdOverlay = vast.adState === 'loading' || vast.isAdPlaying;
   const btnDisabled   = showAdOverlay;
   const showPause     = btnDisabled || isPlaying;
+  const companion     = vast.companion; // null si pas de Companion dans le VAST
 
   return (
     <div className={`dv-widget ${showAdOverlay ? 'dv-widget--ad' : ''}`}>
@@ -163,9 +164,22 @@ export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
         )}
       </div>
 
-      <a className="dv-brand" href="https://dearvoices.com" target="_blank" rel="noreferrer">
-        🎙
-      </a>
+      {/* ── Companion (GIF pub) ou brand icon ── */}
+      {companion ? (
+        companion.clickUrl ? (
+          <a href={companion.clickUrl} target="_blank" rel="noreferrer" className="dv-companion">
+            <img src={companion.imgUrl} alt="Publicité" className="dv-companion-img" />
+          </a>
+        ) : (
+          <div className="dv-companion">
+            <img src={companion.imgUrl} alt="Publicité" className="dv-companion-img" />
+          </div>
+        )
+      ) : (
+        <a className="dv-brand" href="https://dearvoices.com" target="_blank" rel="noreferrer">
+          🎙
+        </a>
+      )}
     </div>
   );
 }

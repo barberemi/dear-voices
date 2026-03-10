@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dev Widget – DearVoices 🔥</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 640px;
+      margin: 60px auto;
+      padding: 0 24px;
+      background: #f0f0f5;
+      color: #333;
+    }
+    h1 { font-size: 1.3rem; margin-bottom: 0.4rem; }
+    p  { color: #666; margin-bottom: 1.5rem; line-height: 1.6; font-size: 0.9rem; }
+    .badge {
+      display: inline-block;
+      background: #10b981;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    label { font-size: 0.8rem; color: #888; font-weight: 600; display: block; margin: 1.5rem 0 0.4rem; }
+    hr { border: none; border-top: 1px solid #ddd; margin: 2rem 0; }
+  </style>
+</head>
+<body>
+  <h1>🧪 Widget DearVoices <span class="badge">HOT RELOAD ✓</span></h1>
+
+  <label>▶ Sans pub</label>
+  <div id="widget-no-vast"></div>
+
+  <hr/>
+
+  <label>▶ Avec VAST pre-roll (Companion GIF)</label>
+  <div id="widget-with-vast"></div>
+
+  <!-- Le widget est monté directement via React/Vite (pas IIFE) -->
+  <script type="module" src="/src/widget/dev-widget-mount.jsx"></script>
+</body>
+</html>

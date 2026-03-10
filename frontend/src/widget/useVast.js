@@ -42,10 +42,21 @@ function parseVast(xmlText) {
     const linear  = doc.querySelector('Linear');
     const skipRaw = linear?.getAttribute('skipoffset') || '';
     const skipOffset = skipRaw.endsWith('%')
-      ? skipRaw                          // résolu plus tard quand durée réelle connue
-      : vastTimeToSeconds(skipRaw);      // secondes ou null
+      ? skipRaw
+      : vastTimeToSeconds(skipRaw);
 
-    return { url, trackers, impression, clickThrough, vastDuration, skipOffset };
+    // ── Companion banner (image affichée à côté du player) ──────────────────
+    const companionEl  = doc.querySelector('Companion');
+    let companion = null;
+    if (companionEl) {
+      const imgUrl   = companionEl.querySelector('StaticResource')?.textContent?.trim();
+      const clickUrl = companionEl.querySelector('CompanionClickThrough')?.textContent?.trim();
+      const width    = companionEl.getAttribute('width');
+      const height   = companionEl.getAttribute('height');
+      if (imgUrl) companion = { imgUrl, clickUrl: clickUrl || null, width, height };
+    }
+
+    return { url, trackers, impression, clickThrough, vastDuration, skipOffset, companion };
   } catch {
     return null;
   }
@@ -77,6 +88,7 @@ export function useVast(vastUrl, onAdEnded) {
   const [adTrackers,    setAdTrackers]   = useState({});
   const [adClickUrl,    setAdClickUrl]   = useState('');
   const [canSkip,       setCanSkip]      = useState(false);
+  const [companion,     setCompanion]    = useState(null); // { imgUrl, clickUrl, width, height }
 
   const isAdPlaying = adState === 'playing';
   const hasAd       = !!vastUrl;
@@ -113,6 +125,7 @@ export function useVast(vastUrl, onAdEnded) {
         setAdDuration(parsed.vastDuration);
       }
       if (parsed.skipOffset !== null) setAdSkipOffset(parsed.skipOffset);
+      if (parsed.companion)           setCompanion(parsed.companion);
 
       setAdState('playing');
     } catch {
@@ -125,6 +138,7 @@ export function useVast(vastUrl, onAdEnded) {
     fireTrackers(isSkip ? adTrackers['skip'] : adTrackers['complete']);
     setAdState('done');
     setCanSkip(false);
+    setCompanion(null);
     startedRef.current = false;
     onAdEnded?.();
   }, [adTrackers, onAdEnded]);
@@ -176,16 +190,12 @@ export function useVast(vastUrl, onAdEnded) {
     : null;
 
   return {
-    // Refs
     adRef,
-    // État
     adState, isAdPlaying, hasAd,
     adAudioUrl, adClickUrl,
-    // Données UI
+    companion,
     adRemaining, adProgress, adSkipOffset, canSkip, skipCountdown,
-    // Actions
     loadVast, handleSkip,
-    // Handlers audio
     handleAdLoaded, handleAdTimeUpdate, handleAdEnded,
   };
 }

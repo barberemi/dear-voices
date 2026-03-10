@@ -1,6 +1,6 @@
 .PHONY: help build up down restart logs logs-backend logs-frontend \
-        dev-backend dev-frontend install-frontend clean prune shell-backend \
-        rebuild rebuild-backend test-widget
+        dev-backend dev-frontend dev-widget install-frontend clean prune shell-backend \
+        rebuild rebuild-backend build-widget
 
 # Couleurs
 CYAN  := \033[36m
@@ -39,11 +39,15 @@ rebuild-backend: ## 🔁 Rebuild uniquement le backend (si requirements.txt a ch
 	docker compose build backend
 	docker compose up -d --no-deps backend
 
-test-widget: ## � Build le widget et le sert en local sur :4000
+# ─────────────────────────────────────────
+# WIDGET
+# ─────────────────────────────────────────
+
+
+
+build-widget: ## 📦 Build le widget IIFE → frontend/dist-widget/widget.iife.js
 	cd frontend && npm run build:widget
-	@echo "$(CYAN)Serveur widget sur http://localhost:4000$(RESET)"
-	@echo ""
-	cd frontend/dist-widget && npx --yes serve . -p 4000
+	@echo "$(CYAN)✓ Widget buildé dans frontend/dist-widget/$(RESET)"
 
 # ─────────────────────────────────────────
 # LOGS
@@ -68,12 +72,15 @@ install-frontend: ## 📦 Installe les dépendances npm du frontend
 dev-frontend: ## ⚡ Lance le serveur de dev Vite (hot reload, exposé sur le réseau)
 	cd frontend && npm run dev -- --host
 
-dev-backend: ## 🐍 Lance FastAPI en local (sans Docker) & chec /docs swagger
+dev-backend: ## 🐍 Lance FastAPI en local (sans Docker) & check /docs swagger
 	cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-dev: ## 🧪 Lance backend + frontend en dev (2 terminaux parallèles)
-	@echo "$(CYAN)Lance le backend et le frontend en parallèle…$(RESET)"
-	@make -j2 dev-backend dev-frontend
+dev-widget: ## 🔥 Lance le widget en mode dev avec hot-reload (http://localhost:3000/dev-widget.html)
+	cd frontend && npm run dev:widget
+
+dev: ## 🧪 Lance backend + frontend + widget en dev (3 terminaux parallèles)
+	@echo "$(CYAN)Lance le backend, frontend et widget en parallèle…$(RESET)"
+	@make -j3 dev-backend dev-frontend dev-widget
 
 # ─────────────────────────────────────────
 # UTILITAIRES

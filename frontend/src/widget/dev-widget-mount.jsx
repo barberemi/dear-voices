@@ -1,0 +1,36 @@
+/**
+ * Point d'entrée DEV uniquement – monte le widget directement via React+Vite
+ * pour bénéficier du hot-reload complet (HMR).
+ * N'est PAS utilisé dans le build IIFE de production.
+ */
+import { createRoot } from 'react-dom/client';
+import Widget from './Widget';
+import './widget.css'; // Vite l'injecte normalement en dev (pas Shadow DOM)
+
+const API  = 'http://localhost:8000';
+const ID   = 'output_803b790a.wav';   // ← change ici si besoin
+const VAST = 'http://localhost:8000/test-vast'; // ← ou '' pour tester sans pub
+
+// ── Sans pub ─────────────────────────────────────────────────────────────────
+const elNoVast = document.getElementById('widget-no-vast');
+if (elNoVast) {
+  createRoot(elNoVast).render(
+    <Widget
+      audioUrl={`${API}/audio/${ID}`}
+      duration={0}
+      vastUrl=""
+    />
+  );
+}
+
+// ── Avec VAST ─────────────────────────────────────────────────────────────────
+const elWithVast = document.getElementById('widget-with-vast');
+if (elWithVast) {
+  createRoot(elWithVast).render(
+    <Widget
+      audioUrl={`${API}/audio/${ID}`}
+      duration={0}
+      vastUrl={VAST}
+    />
+  );
+}

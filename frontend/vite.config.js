@@ -18,26 +18,11 @@ function injectWidgetCss() {
   };
 }
 
-// Plugin qui copie test-widget.html → dist-widget/index.html après le build
-function copyTestPage() {
-  return {
-    name: 'copy-test-page',
-    closeBundle() {
-      const src  = path.resolve(__dirname, 'test-widget.html');
-      const dest = path.resolve(__dirname, 'dist-widget/index.html');
-      if (fs.existsSync(src)) {
-        fs.copyFileSync(src, dest);
-        console.log('✓ test-widget.html copié → dist-widget/index.html');
-      }
-    },
-  };
-}
-
 // Détermine quel build faire selon la variable d'env VITE_BUILD_TARGET
 const isWidget = process.env.VITE_BUILD_TARGET === 'widget';
 
 export default defineConfig({
-  plugins: [react(), injectWidgetCss(), ...(isWidget ? [copyTestPage()] : [])],
+  plugins: [react(), injectWidgetCss()],
   server: {
     port: 3000,
     proxy: {
@@ -48,6 +33,8 @@ export default defineConfig({
       },
     },
   },
+  // Expose dev-widget.html comme page supplémentaire du dev server
+  appType: 'mpa',
   build: isWidget
     ? {
         // ── Build du widget embarquable ──

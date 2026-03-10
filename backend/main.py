@@ -183,6 +183,14 @@ def test_vast():
               </MediaFile>
             </MediaFiles>
           </Linear>
+          <Companion id="romu-gif" width="480" height="480">
+            <StaticResource creativeType="image/gif">
+              <![CDATA[http://localhost:4000/ads/romu-dance.gif]]>
+            </StaticResource>
+            <CompanionClickThrough>
+              <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
+            </CompanionClickThrough>
+          </Companion>
         </Creative>
       </Creatives>
     </InLine>

@@ -170,6 +170,37 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ─── COMPANION (GIF pub en bout de player) ────────────────────────── */
+.dv-companion {
+  animation: dance-wiggle 0.5s infinite linear;
+  transform-origin: bottom center; /* Pour qu'elle danse "posée au sol" */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;           /* fond blanc pour GIFs transparents */
+  border: 1px solid rgba(251, 146, 60, 0.4);
+  box-shadow: 0 2px 8px rgba(251, 146, 60, 0.2);
+  text-decoration: none;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.dv-companion:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(251, 146, 60, 0.35);
+}
+
+.dv-companion-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 /* Bouton skip */
 .dv-skip-btn {
   font-size: 0.6rem;
@@ -191,4 +222,12 @@
 
 .dv-skip-btn--ready:hover {
   background: rgba(251, 146, 60, 0.15);
+}
+
+@keyframes dance-wiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
 }

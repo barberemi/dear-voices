@@ -185,7 +185,7 @@ def test_vast():
           </Linear>
           <Companion id="romu-gif" width="480" height="480">
             <StaticResource creativeType="image/gif">
-              <![CDATA[http://localhost:3002/ads/romu-dance.gif]]>
+              <![CDATA[http://localhost:3001/ads/romu-dance.gif]]>
             </StaticResource>
             <CompanionClickThrough>
               <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>

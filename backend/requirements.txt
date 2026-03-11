@@ -8,3 +8,4 @@ soundfile
 librosa
 pydub
 python-multipart
+watchfiles       # hot-reload uvicorn dans Docker (polling sur bind mount)

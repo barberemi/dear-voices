@@ -13,9 +13,9 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY requirements.txt .
+# En DEV local : On peut commenter la ligne suivante si on utilise le bind mount.
+# En PROD/CI : On la laisse pour que l'image soit autonome.
 # RUN pip3 install --no-cache-dir -r requirements.txt
-# ↑ Commenté : les packages sont montés depuis ~/.local/share/dearvoices/pip-packages
-#   Si tu veux un build autonome (CI/CD, autre machine), décommente cette ligne.
 
 COPY . .
 
@@ -23,4 +23,4 @@ RUN mkdir -p /app/uploads /app/outputs
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -94,16 +94,22 @@
   gap: 0.4rem;
   font-size: 0.82rem;
   color: #60a5fa;
-  text-decoration: none;
+  background: none;
+  cursor: pointer;
   align-self: flex-start;
   padding: 0.4rem 0.75rem;
   border: 1px solid rgba(96,165,250,0.3);
   border-radius: 8px;
-  transition: background 0.2s;
+  transition: background 0.2s, opacity 0.2s;
 }
 
 .download-btn:hover {
   background: rgba(96, 165, 250, 0.1);
+}
+
+.download-btn--busy {
+  opacity: 0.55;
+  cursor: wait;
 }
 
 /* ─── ENCART INTÉGRATION ─── */

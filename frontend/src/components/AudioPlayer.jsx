@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import './AudioPlayer.css';
 
 export default function AudioPlayer({ src, filename, apiUrl }) {
@@ -9,6 +9,7 @@ export default function AudioPlayer({ src, filename, apiUrl }) {
   const [duration, setDuration] = useState(0);
   const progressBarRef = useRef(null);
   const [copied, setCopied] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   // Construit le tag <script> prêt à intégrer sur un site externe
   const widgetApiUrl = apiUrl || 'http://localhost:8000';
@@ -81,6 +82,30 @@ export default function AudioPlayer({ src, filename, apiUrl }) {
     });
   };
 
+  // Téléchargement via fetch+blob pour contourner la restriction cross-origin
+  // (l'attribut HTML `download` est ignoré par les navigateurs sur les URLs cross-origin)
+  const handleDownload = useCallback(async () => {
+    if (downloading) return;
+    setDownloading(true);
+    try {
+      const res = await fetch(src);
+      if (!res.ok) throw new Error('Erreur réseau');
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename || 'dearvoices_output.wav';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      alert('Impossible de télécharger le fichier. Vérifie que le backend est accessible.');
+    } finally {
+      setDownloading(false);
+    }
+  }, [src, filename, downloading]);
+
   return (
     <div className="player">
       <audio
@@ -118,13 +143,13 @@ export default function AudioPlayer({ src, filename, apiUrl }) {
         </div>
       </div>
 
-      <a
-        className="download-btn"
-        href={src}
-        download={filename || 'dearvoices_output.wav'}
+      <button
+        className={`download-btn ${downloading ? 'download-btn--busy' : ''}`}
+        onClick={handleDownload}
+        disabled={downloading}
       >
-        ⬇ Télécharger le fichier WAV
-      </a>
+        {downloading ? '⏳ Téléchargement…' : '⬇ Télécharger le fichier WAV'}
+      </button>
 
       {/* ─── Encart "Intégrer sur mon site" ─── */}
       <div className="embed-block">

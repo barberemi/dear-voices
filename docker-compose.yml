@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   # ─────────────────────────────────────────
   # BACKEND  –  FastAPI + XTTS v2
@@ -19,6 +17,7 @@ services:
       - /home/rbarbe/.local/share/tts:/root/.local/share/tts:ro                          # Coqui TTS models (~2GB)
       - /home/rbarbe/.cache/huggingface:/root/.cache/huggingface:ro                      # Hugging Face models
       - /home/rbarbe/.cache/torch:/root/.cache/torch:ro                                  # PyTorch hub models
+      # Attention : vérifie que le dossier pip-packages correspond bien à la version python du Dockerfile (3.10)
       - /home/rbarbe/.local/share/dearvoices/pip-packages:/usr/local/lib/python3.10/dist-packages:ro  # Packages pip (~7GB, évite le réinstall)
     environment:
       - PYTHONUNBUFFERED=1
@@ -33,29 +32,27 @@ services:
     networks:
       - dearvoices_net
 
-  # ─────────────────────────────────────────
-  # FRONTEND  –  React (build) servi par Nginx
-  # ─────────────────────────────────────────
+  # ────────────────────────────────────────────────
+  # FRONTEND  –  React (Vite en Dev / Nginx en Prod)
+  # ────────────────────────────────────────────────
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      target: dev # On utilise l'étape de dev pour le hot-reload
     container_name: dearvoices_frontend
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "3000:3000" # Vite écoute sur 3000 (défini dans vite.config.js)
+    volumes:
+      - ./frontend:/app # Permet le hot-reload depuis ton éditeur
+      - /app/node_modules # Évite que ton node_modules local n'écrase celui du conteneur
     environment:
       - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend
     networks:
       - dearvoices_net
-
-# ─────────────────────────────────────────
-# VOLUMES persistants
-# ─────────────────────────────────────────
-# Les uploads et outputs sont maintenant des bind mounts (./backend/uploads et ./backend/outputs)
-# Plus besoin de volumes nommés pour ces dossiers.
 
 # ─────────────────────────────────────────
 # RÉSEAU interne

@@ -42,68 +42,36 @@ DearVoices/
 
 ---
 
-## 🚀 Lancement rapide
-
-### Option A — Docker (recommandé pour la prod)
+## 🚀 Lancement rapide (Docker)
 
 ```bash
-make install-frontend   # Une seule fois (installe npm)
-make build              # Build les images Docker
-make up                 # Lance backend + frontend
+# 1. Préparer l'environnement (une seule fois)
+make install
+
+# 2. Lancer toute la stack (Frontend + Backend + GPU)
+make start
 ```
 
-| Service | URL |
+| Service | URL | Note |
 |---|---|
-| **Application** | http://localhost:3000 |
-| **API (Swagger)** | http://localhost:8000/docs |
-
----
-
-### Option B — Développement local (hot reload complet)
-
-Lance chaque service dans un terminal séparé :
-
-```bash
-# Terminal 1 — Backend FastAPI (hot reload)
-make dev-backend        # → http://localhost:8000
-
-# Terminal 2 — Frontend React/Vite (hot reload)
-make dev-frontend       # → http://localhost:3000
-
-# Terminal 3 — Widget en mode dev (hot reload)
-make dev-widget         # → http://localhost:3000/dev-widget.html
-```
-
-> **`make dev-widget`** ouvre directement la page de test du widget avec HMR activé.  
-> Chaque modification dans `src/widget/` est rechargée instantanément, **sans aucun build**.
-
----
+| **Application** | http://localhost:3000 | Port mappé vers le 5173 de Vite |
+| **API (Swagger)** | http://localhost:8000/docs | Documentation Swagger |
+| **Widget Test** | http://localhost:3002/dev-widget.html | Sandbox publicitaire |
 
 ## 🧩 Widget embarquable
 
 Le widget est un player audio autonome intégrable sur n'importe quel site via une balise `<script>`.  
 Il supporte le **VAST pré-roll audio** (pub, skip, tracking IAB, Companion GIF).
 
-### Développement du widget
+> **`make dev-widget`** ouvre directement la page de test du widget avec HMR activé.  
+> Chaque modification dans `src/widget/` est rechargée instantanément, **sans aucun build**.
 
-```bash
-make dev-widget
-# Ouvre http://localhost:3000/dev-widget.html
-# → hot reload complet, deux instances (avec et sans VAST)
-```
 
 Pour changer l'audio testé, édite directement `src/widget/dev-widget-mount.jsx` :
 
 ```js
 const ID   = 'output_mon_fichier.wav';   // ← nom du fichier généré
 const VAST = 'http://localhost:8000/test-vast'; // ← ou '' pour tester sans pub
-```
-
-### Build de production
-
-```bash
-make build-widget
-# → génère frontend/dist-widget/widget.iife.js
 ```
 
 ### Intégrer sur un site

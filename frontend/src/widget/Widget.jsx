@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { useVast } from './useVast';
+import { useVmap } from './useVmap';
 import AdOverlay from './AdOverlay';
 
 // ─── Composant principal ─────────────────────────────────────────────────────
-export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
+export default function Widget({ audioUrl, duration = 0, vmapUrl = '' }) {
   const audioRef    = useRef(null);
   const progressRef = useRef(null);
 
@@ -19,25 +19,54 @@ export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
     setProgress(0);
   }, [audioUrl]);
 
-  // ── Callback appelé par useVast quand la pub se termine ─────────────────
-  const handleAdEnded = () => {
+  // ── Callbacks VMAP ────────────────────────────────────────────────────────
+  // Pre-roll terminé → lancer le contenu
+  const handlePreRollEnded = () => {
     audioRef.current?.play().catch(() => {});
     setIsPlaying(true);
   };
 
-  const vast = useVast(vastUrl, handleAdEnded);
+  // Mid-roll démarre → pauser le contenu
+  const handleMidRollStart = () => {
+    audioRef.current?.pause();
+    setIsPlaying(false);
+  };
 
-  // ── Contrôles audio WAV ──────────────────────────────────────────────────
+  // Mid-roll terminé → reprendre le contenu
+  const handleMidRollEnded = () => {
+    audioRef.current?.play().catch(() => {});
+    setIsPlaying(true);
+  };
+
+  // Post-roll terminé → reset complet
+  const handlePostRollEnded = () => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setProgress(0);
+    if (audioRef.current) {
+      audioRef.current.pause();      // certains navigateurs relancent la lecture au seek sur un élément "ended"
+      audioRef.current.currentTime = 0;
+    }
+  };
+
+  const vmap = useVmap(vmapUrl, {
+    onPreRollEnded:  handlePreRollEnded,
+    onMidRollStart:  handleMidRollStart,
+    onMidRollEnded:  handleMidRollEnded,
+    onPostRollEnded: handlePostRollEnded,
+  });
+
+  // ── Contrôles audio principal ─────────────────────────────────────────────
   const togglePlay = () => {
     // Pub en cours ou en chargement → rien
-    if (vast.adState === 'loading' || vast.isAdPlaying) return;
+    if (vmap.adState === 'loading' || vmap.isAdPlaying) return;
 
     const audio = audioRef.current;
     if (!audio) return;
 
-    // Premier clic avec VAST → lance la pub
-    if (vast.hasAd && vast.adState === 'idle') {
-      vast.loadVast();
+    // Premier clic avec pre-roll → lance la pub avant le contenu
+    if (vmap.hasPreRoll && !vmap.preRollPlayed) {
+      vmap.loadPreRoll();
       return;
     }
 
@@ -56,11 +85,18 @@ export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
     if (!a?.duration) return;
     setCurrentTime(a.currentTime);
     setProgress((a.currentTime / a.duration) * 100);
+    // Vérifie si un mid-roll doit se déclencher à ce timestamp
+    vmap.checkMidRoll(a.currentTime, a.duration);
   };
 
   const handleLoadedMetadata = () => setTotalDuration(audioRef.current?.duration || duration);
 
   const handleEnded = () => {
+    // Post-roll : joue la pub de fin avant de resetter
+    if (vmap.hasPostRoll && !vmap.postRollPlayed) {
+      vmap.loadPostRoll();
+      return;
+    }
     setIsPlaying(false);
     setCurrentTime(0);
     setProgress(0);
@@ -68,7 +104,7 @@ export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
   };
 
   const handleProgressClick = (e) => {
-    if (vast.isAdPlaying) return;
+    if (vmap.isAdPlaying) return;
     const bar = progressRef.current;
     if (!bar || !audioRef.current?.duration) return;
     const rect  = bar.getBoundingClientRect();
@@ -82,23 +118,23 @@ export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
     return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
   };
 
-  // ── Dérivés UI ───────────────────────────────────────────────────────────
-  const showAdOverlay = vast.adState === 'loading' || vast.isAdPlaying;
+  // ── Dérivés UI ─────────────────────────────────────────────────────────────
+  const showAdOverlay = vmap.adState === 'loading' || vmap.isAdPlaying;
   const btnDisabled   = showAdOverlay;
   const showPause     = btnDisabled || isPlaying;
-  const companion     = vast.companion; // null si pas de Companion dans le VAST
+  const companion     = vmap.companion;
 
   return (
     <div className={`dv-widget ${showAdOverlay ? 'dv-widget--ad' : ''}`}>
 
       {/* ── Élément audio de la pub (caché) ── */}
-      {vast.adAudioUrl && (
+      {vmap.adAudioUrl && (
         <audio
-          ref={vast.adRef}
-          src={vast.adAudioUrl}
-          onTimeUpdate={vast.handleAdTimeUpdate}
-          onLoadedMetadata={vast.handleAdLoaded}
-          onEnded={vast.handleAdEnded}
+          ref={vmap.adRef}
+          src={vmap.adAudioUrl}
+          onTimeUpdate={vmap.handleAdTimeUpdate}
+          onLoadedMetadata={vmap.handleAdLoaded}
+          onEnded={vmap.handleAdEnded}
           preload="auto"
         />
       )}
@@ -138,14 +174,14 @@ export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
         {/* ── Barre de pub ── */}
         {showAdOverlay && (
           <AdOverlay
-            adState={vast.adState}
-            adProgress={vast.adProgress}
-            adRemaining={vast.adRemaining}
-            adClickUrl={vast.adClickUrl}
-            adSkipOffset={vast.adSkipOffset}
-            canSkip={vast.canSkip}
-            skipCountdown={vast.skipCountdown}
-            onSkip={vast.handleSkip}
+            adState={vmap.adState}
+            adProgress={vmap.adProgress}
+            adRemaining={vmap.adRemaining}
+            adClickUrl={vmap.adClickUrl}
+            adSkipOffset={vmap.adSkipOffset}
+            canSkip={vmap.canSkip}
+            skipCountdown={vmap.skipCountdown}
+            onSkip={vmap.handleSkip}
           />
         )}
 
@@ -176,7 +212,7 @@ export default function Widget({ audioUrl, duration = 0, vastUrl = '' }) {
           </div>
         )
       ) : (
-        <a className="dv-brand" href="https://dearvoices.com" target="_blank" rel="noreferrer">
+        <a className="dv-brand" href="http://localhost:3000/" target="_blank" rel="noreferrer">
           🎙
         </a>
       )}

@@ -162,40 +162,183 @@ def voice_status():
 def test_vast():
     """Faux tag VAST pour tester le pre-roll audio en local."""
     xml = """<?xml version="1.0" encoding="UTF-8"?>
-<VAST version="3.0">
-  <Ad id="test-ad-001">
-    <InLine>
-      <AdSystem>DearVoices Test</AdSystem>
-      <AdTitle>Test Pre-Roll</AdTitle>
-      <Impression><![CDATA[http://localhost:8000/vast-ping?event=impression]]></Impression>
-      <Creatives>
-        <Creative>
-          <Linear skipoffset="00:00:10">
-            <Duration>00:00:15</Duration>
-            <TrackingEvents>
-              <Tracking event="start"><![CDATA[http://localhost:8000/vast-ping?event=start]]></Tracking>
-              <Tracking event="skip"><![CDATA[http://localhost:8000/vast-ping?event=skip]]></Tracking>
-              <Tracking event="complete"><![CDATA[http://localhost:8000/vast-ping?event=complete]]></Tracking>
-            </TrackingEvents>
-            <MediaFiles>
-              <MediaFile type="audio/mpeg" delivery="progressive">
-                <![CDATA[https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3]]>
-              </MediaFile>
-            </MediaFiles>
-          </Linear>
-          <Companion id="romu-gif" width="480" height="480">
-            <StaticResource creativeType="image/gif">
-              <![CDATA[http://localhost:3001/ads/romu-dance.gif]]>
-            </StaticResource>
-            <CompanionClickThrough>
-              <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
-            </CompanionClickThrough>
-          </Companion>
-        </Creative>
-      </Creatives>
-    </InLine>
-  </Ad>
-</VAST>"""
+<vmap:VMAP xmlns:vmap="http://www.iab.net/vmap-1.0" version="1.0">
+
+  <vmap:AdBreak timeOffset="start" breakType="linear" breakId="preroll">
+    <vmap:AdSource id="preroll-ad-1" allowMultipleAds="false" followRedirects="true">
+      <vmap:VASTAdData>
+        <VAST version="3.0">
+          <Ad id="test-ad-001">
+            <InLine>
+              <AdSystem>DearVoices Test</AdSystem>
+              <AdTitle>Test Pre-Roll</AdTitle>
+              <Impression><![CDATA[http://localhost:8000/vast-ping?event=impression&pos=pre]]></Impression>
+              <Creatives>
+                <Creative>
+                  <Linear skipoffset="00:00:05">
+                    <Duration>00:00:10</Duration>
+                    <TrackingEvents>
+                      <Tracking event="start"><![CDATA[http://localhost:8000/vast-ping?event=start&pos=pre]]></Tracking>
+                      <Tracking event="skip"><![CDATA[http://localhost:8000/vast-ping?event=skip&pos=pre]]></Tracking>
+                      <Tracking event="complete"><![CDATA[http://localhost:8000/vast-ping?event=complete&pos=pre]]></Tracking>
+                    </TrackingEvents>
+                    <MediaFiles>
+                      <MediaFile type="audio/mpeg" delivery="progressive">
+                        <![CDATA[https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3]]>
+                      </MediaFile>
+                    </MediaFiles>
+                  </Linear>
+                  <Companion id="romu-gif" width="480" height="480">
+                    <StaticResource creativeType="image/gif">
+                      <![CDATA[http://localhost:3000/ads/romu-dance.gif]]>
+                    </StaticResource>
+                    <CompanionClickThrough>
+                      <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
+                    </CompanionClickThrough>
+                  </Companion>
+                </Creative>
+              </Creatives>
+            </InLine>
+          </Ad>
+        </VAST>
+      </vmap:VASTAdData>
+    </vmap:AdSource>
+  </vmap:AdBreak>
+
+</vmap:VMAP>"""
+    return Response(content=xml, media_type="application/xml")
+
+# VMAP test part
+@app.get("/test-vmap")
+def test_vmap():
+    """Faux tag VMAP pour tester le pre-roll, middle-roll, end-roll audio en local."""
+    xml = """<?xml version="1.0" encoding="UTF-8"?>
+<vmap:VMAP xmlns:vmap="http://www.iab.net/vmap-1.0" version="1.0">
+
+  <vmap:AdBreak timeOffset="start" breakType="linear" breakId="preroll">
+    <vmap:AdSource id="preroll-ad-1" allowMultipleAds="false" followRedirects="true">
+      <vmap:VASTAdData>
+        <VAST version="3.0">
+          <Ad id="test-ad-001">
+            <InLine>
+              <AdSystem>DearVoices Test</AdSystem>
+              <AdTitle>Test Pre-Roll</AdTitle>
+              <Impression><![CDATA[http://localhost:8000/vast-ping?event=impression&pos=pre]]></Impression>
+              <Creatives>
+                <Creative>
+                  <Linear skipoffset="00:00:05">
+                    <Duration>00:00:10</Duration>
+                    <TrackingEvents>
+                      <Tracking event="start"><![CDATA[http://localhost:8000/vast-ping?event=start&pos=pre]]></Tracking>
+                      <Tracking event="skip"><![CDATA[http://localhost:8000/vast-ping?event=skip&pos=pre]]></Tracking>
+                      <Tracking event="complete"><![CDATA[http://localhost:8000/vast-ping?event=complete&pos=pre]]></Tracking>
+                    </TrackingEvents>
+                    <MediaFiles>
+                      <MediaFile type="audio/mpeg" delivery="progressive">
+                        <![CDATA[https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3]]>
+                      </MediaFile>
+                    </MediaFiles>
+                  </Linear>
+                  <Companion id="romu-gif" width="480" height="480">
+                    <StaticResource creativeType="image/gif">
+                      <![CDATA[http://localhost:3000/ads/romu-dance.gif]]>
+                    </StaticResource>
+                    <CompanionClickThrough>
+                      <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
+                    </CompanionClickThrough>
+                  </Companion>
+                </Creative>
+              </Creatives>
+            </InLine>
+          </Ad>
+        </VAST>
+      </vmap:VASTAdData>
+    </vmap:AdSource>
+  </vmap:AdBreak>
+
+  <vmap:AdBreak timeOffset="50%" breakType="linear" breakId="midroll">
+    <vmap:AdSource id="midroll-ad-1" allowMultipleAds="false" followRedirects="true">
+      <vmap:VASTAdData>
+        <VAST version="3.0">
+          <Ad id="test-ad-001">
+            <InLine>
+              <AdSystem>DearVoices Test</AdSystem>
+              <AdTitle>Test Mid-Roll</AdTitle>
+              <Impression><![CDATA[http://localhost:8000/vast-ping?event=impression&pos=mid]]></Impression>
+              <Creatives>
+                <Creative>
+                  <Linear skipoffset="00:00:05">
+                    <Duration>00:00:10</Duration>
+                    <TrackingEvents>
+                      <Tracking event="start"><![CDATA[http://localhost:8000/vast-ping?event=start&pos=middle]]></Tracking>
+                      <Tracking event="skip"><![CDATA[http://localhost:8000/vast-ping?event=skip&pos=middle]]></Tracking>
+                      <Tracking event="complete"><![CDATA[http://localhost:8000/vast-ping?event=complete&pos=middle]]></Tracking>
+                    </TrackingEvents>
+                    <MediaFiles>
+                      <MediaFile type="audio/mpeg" delivery="progressive">
+                        <![CDATA[https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3]]>
+                      </MediaFile>
+                    </MediaFiles>
+                  </Linear>
+                  <Companion id="romu-gif" width="480" height="480">
+                    <StaticResource creativeType="image/gif">
+                      <![CDATA[http://localhost:3000/ads/mathilde-yeux-rouge.gif]]>
+                    </StaticResource>
+                    <CompanionClickThrough>
+                      <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
+                    </CompanionClickThrough>
+                  </Companion>
+                </Creative>
+              </Creatives>
+            </InLine>
+          </Ad>
+        </VAST>
+      </vmap:VASTAdData>
+    </vmap:AdSource>
+  </vmap:AdBreak>
+
+  <vmap:AdBreak timeOffset="end" breakType="linear" breakId="postroll">
+    <vmap:AdSource id="postroll-ad-1" allowMultipleAds="false" followRedirects="true">
+      <vmap:VASTAdData>
+        <VAST version="3.0">
+          <Ad id="test-ad-001">
+            <InLine>
+              <AdSystem>DearVoices Test</AdSystem>
+              <AdTitle>Test Post-Roll</AdTitle>
+              <Impression><![CDATA[http://localhost:8000/vast-ping?event=impression&pos=post]]></Impression>
+              <Creatives>
+                <Creative>
+                  <Linear skipoffset="00:00:05">
+                    <Duration>00:00:10</Duration>
+                    <TrackingEvents>
+                      <Tracking event="start"><![CDATA[http://localhost:8000/vast-ping?event=start&pos=post]]></Tracking>
+                      <Tracking event="skip"><![CDATA[http://localhost:8000/vast-ping?event=skip&pos=post]]></Tracking>
+                      <Tracking event="complete"><![CDATA[http://localhost:8000/vast-ping?event=complete&pos=post]]></Tracking>
+                    </TrackingEvents>
+                    <MediaFiles>
+                      <MediaFile type="audio/mpeg" delivery="progressive">
+                        <![CDATA[https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3]]>
+                      </MediaFile>
+                    </MediaFiles>
+                  </Linear>
+                  <Companion id="romu-gif" width="480" height="480">
+                    <StaticResource creativeType="image/gif">
+                      <![CDATA[http://localhost:3000/ads/romu-dance.gif]]>
+                    </StaticResource>
+                    <CompanionClickThrough>
+                      <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
+                    </CompanionClickThrough>
+                  </Companion>
+                </Creative>
+              </Creatives>
+            </InLine>
+          </Ad>
+        </VAST>
+      </vmap:VASTAdData>
+    </vmap:AdSource>
+  </vmap:AdBreak>
+
+</vmap:VMAP>"""
     return Response(content=xml, media_type="application/xml")
 
 @app.get("/vast-ping")

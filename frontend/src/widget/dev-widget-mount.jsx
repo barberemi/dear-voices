@@ -9,40 +9,41 @@ import './widget.css'; // Vite l'injecte normalement en dev (pas Shadow DOM)
 
 const API  = 'http://localhost:8000';
 const ID   = 'output_803b790a.wav';   // ← change ici si besoin
-const VAST = 'http://localhost:8000/test-vast'; // ← ou '' pour tester sans pub
+const VAST = 'http://localhost:8000/test-vast';
+const VMAP = 'http://localhost:8000/test-vmap';
 
-// ── Sans pub ─────────────────────────────────────────────────────────────────
+// ── Sans pub ──────────────────────────────────────────────────────────────────
 const elNoVast = document.getElementById('widget-no-vast');
 if (elNoVast) {
   createRoot(elNoVast).render(
     <Widget
       audioUrl={`${API}/audio/${ID}`}
       duration={0}
-      vastUrl=""
+      vmapUrl=""
     />
   );
 }
 
-// ── Avec VAST PRE-roll ─────────────────────────────────────────────────────────────────
+// ── Avec VMAP PRE-roll ────────────────────────────────────────────────────────
 const elWithVast = document.getElementById('widget-with-pre-roll');
 if (elWithVast) {
   createRoot(elWithVast).render(
     <Widget
       audioUrl={`${API}/audio/${ID}`}
       duration={0}
-      vastUrl={VAST}
+      vmapUrl={VAST}
     />
   );
 }
 
-// ── Avec VAST ALL-ROLL ─────────────────────────────────────────────────────────────────
+// ── Avec VMAP ALL-ROLL (pre + mid + post) ─────────────────────────────────────
 const elWithAllRoll = document.getElementById('widget-with-all-roll');
 if (elWithAllRoll) {
   createRoot(elWithAllRoll).render(
     <Widget
       audioUrl={`${API}/audio/${ID}`}
       duration={0}
-      vastUrl={VAST}
+      vmapUrl={VMAP}
     />
   );
 }

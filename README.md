@@ -1,6 +1,6 @@
-# 🎙️ DearVoices
+# DearVoices
 
-Clone ta voix et lis n'importe quel texte avec elle.  
+Clone ta voix et lis n'importe quel texte avec elle.
 Stack : **FastAPI** + **Coqui XTTS v2** + **React / Vite** + **Docker**
 
 ---
@@ -9,8 +9,7 @@ Stack : **FastAPI** + **Coqui XTTS v2** + **React / Vite** + **Docker**
 
 - [Docker](https://docs.docker.com/get-docker/) + Docker Compose
 - [Node.js 20+](https://nodejs.org/) (pour le dev frontend local)
-- Le modèle XTTS v2 téléchargé localement dans `~/.local/share/tts/`  
-  _(si absent, il sera téléchargé automatiquement au premier démarrage, ~2 GB)_
+- Le modèle XTTS v2 dans `~/.local/share/tts/` _(téléchargé automatiquement au 1er démarrage, ~2 GB)_
 
 ---
 
@@ -18,299 +17,173 @@ Stack : **FastAPI** + **Coqui XTTS v2** + **React / Vite** + **Docker**
 
 ```
 DearVoices/
-├── docker-compose.yml        # Orchestre backend + frontend
-├── Makefile                  # Toutes les commandes (voir ci-dessous)
+├── docker-compose.yml            # Orchestre backend + frontend
+├── Makefile                      # Toutes les commandes utiles
 ├── backend/
 │   ├── Dockerfile
 │   ├── requirements.txt
-│   └── main.py               # API FastAPI (upload voix, génération, stream audio)
+│   └── main.py                   # API FastAPI
 └── frontend/
     ├── Dockerfile
-    ├── vite.config.js
-    ├── dev-widget.html       # Page de dev widget (hot reload)
-    ├── src/
-    │   ├── App.jsx           # Application principale
-    │   ├── components/       # VoiceRecorder, TextToSpeech, AudioPlayer
-    │   └── widget/
-    │       ├── Widget.jsx          # Composant player embarquable
-    │       ├── AdOverlay.jsx       # UI pub VAST (barre, skip, compte à rebours)
-    │       ├── useVast.js          # Hook logique VAST (parse, tracking, skip, companion)
-    │       ├── widget-entry.jsx    # Point d'entrée IIFE (production)
-    │       ├── dev-widget-mount.jsx # Point d'entrée dev (HMR, pas IIFE)
-    │       └── widget.css          # Styles isolés (injectés dans le Shadow DOM)
+    ├── vite.config.js             # Config Vite (app + widget IIFE)
+    ├── index.html                 # App principale
+    ├── dev-widget.html            # Sandbox widget avec hot-reload
+    ├── public/
+    │   └── ads/                   # GIFs companion pour les tests pub
+    ├── dist/                      # Build app principale (npm run build)
+    ├── dist-widget/               # Build widget IIFE (npm run build:widget)
+    └── src/
+        ├── App.jsx
+        ├── components/            # VoiceRecorder, TextToSpeech, AudioPlayer
+        └── widget/
+            ├── Widget.jsx         # Composant player embarquable
+            ├── AdOverlay.jsx      # UI pub (barre, badge, skip, compte à rebours)
+            ├── useVmap.js         # Hook VMAP (pre / mid / post-roll, tracking IAB)
+            ├── widget-entry.jsx   # Point d'entrée IIFE (production, paramètre ?vmap=)
+            ├── dev-widget-mount.jsx # Point d'entrée dev (HMR)
+            └── widget.css         # Styles isolés (injectés dans le Shadow DOM)
 ```
 
 ---
 
-## 🚀 Lancement rapide (Docker)
+## Lancement rapide
 
 ```bash
-# 1. Préparer l'environnement (une seule fois)
+# 1. Installer les dépendances (une seule fois)
 make install
 
-# 2. Lancer toute la stack (Frontend + Backend + GPU)
+# 2. Lancer toute la stack
 make start
 ```
 
-| Service | URL | Note |
-|---|---|
-| **Application** | http://localhost:3000 | Port mappé vers le 5173 de Vite |
-| **API (Swagger)** | http://localhost:8000/docs | Documentation Swagger |
-| **Widget Test** | http://localhost:3002/dev-widget.html | Sandbox publicitaire |
+### URLs en dev
 
-## 🧩 Widget embarquable
-
-Le widget est un player audio autonome intégrable sur n'importe quel site via une balise `<script>`.  
-Il supporte le **VAST pré-roll audio** (pub, skip, tracking IAB, Companion GIF).
-
-> **`make dev-widget`** ouvre directement la page de test du widget avec HMR activé.  
-> Chaque modification dans `src/widget/` est rechargée instantanément, **sans aucun build**.
-
-
-Pour changer l'audio testé, édite directement `src/widget/dev-widget-mount.jsx` :
-
-```js
-const ID   = 'output_mon_fichier.wav';   // ← nom du fichier généré
-const VAST = 'http://localhost:8000/test-vast'; // ← ou '' pour tester sans pub
-```
-
-### Intégrer sur un site
-
-```html
-<script src="https://ton-domaine.com/widget.iife.js?id=output_xxxx.wav&api=https://ton-domaine.com:8000"></script>
-```
-
-**Paramètres URL disponibles :**
-
-| Paramètre | Description | Exemple |
+| Service | URL | Description |
 |---|---|---|
-| `id` | Nom du fichier audio généré | `output_a1b2c3.wav` |
-| `api` | URL de base de l'API | `https://ton-domaine.com:8000` |
-| `vast` | URL du tag VAST (optionnel) | `https://adserver.com/tag.xml` |
-| `title` | Titre affiché dans le player (optionnel) | `Mon podcast` |
+| **Application** | http://localhost:3000 | Frontend React (Vite dev server) |
+| **API** | http://localhost:8000 | Backend FastAPI |
+| **Swagger** | http://localhost:8000/docs | Documentation interactive de l'API |
+| **Widget sandbox** | http://localhost:3000/dev-widget.html | Page de test du widget (hot-reload) |
+
+> Le frontend proxifie automatiquement `/api/*` vers le backend (`http://localhost:8000`).
 
 ---
 
 ## Utilisation
 
-1. **Enregistre ta voix** — clique sur _Démarrer l'enregistrement_ et lis un texte pendant ~15 secondes
+1. **Enregistre ta voix** — clique sur _Démarrer l'enregistrement_ et lis un texte ~15 secondes
 2. **Tape ton texte** — choisis la langue et saisis le texte à lire
 3. **Génère l'audio** — clique sur _Générer l'audio_ et attends le résultat
 4. **Écoute / télécharge** — le player apparaît avec une barre de progression
 
 Les fichiers sont sauvegardés dans :
-- `backend/uploads/ma_voix.wav` — ta voix de référence
-- `backend/outputs/output_xxxx.wav` — les audios générés
-
----
-
-## Commandes disponibles
-
-```bash
-make help   # Liste toutes les commandes avec description
-```
-
-| Commande | Description |
-|---|---|
-| `make build` | Build les images Docker |
-| `make up` | Lance tous les services (Docker) |
-| `make down` | Arrête tous les services |
-| `make restart` | Redémarre tous les services |
-| `make rebuild` | Stop + build --no-cache + relance |
-| `make rebuild-backend` | Rebuild uniquement le backend |
-| `make logs` | Logs live de tous les services |
-| `make logs-backend` | Logs FastAPI uniquement |
-| `make logs-frontend` | Logs Nginx uniquement |
-| `make dev-backend` | FastAPI en local avec hot reload (`:8000`) |
-| `make dev-frontend` | Vite en local avec hot reload (`:3000`) |
-| `make dev` | Backend + frontend en parallèle |
-| `make dev-widget` | Widget en dev avec hot reload (`:3000/dev-widget.html`) |
-| `make build-widget` | Build le widget IIFE → `dist-widget/widget.iife.js` |
-| `make install-frontend` | `npm install` du frontend |
-| `make shell-backend` | Shell dans le conteneur backend |
-| `make clean` | Supprime les fichiers audio générés |
-| `make prune` | Nettoie les images/volumes Docker inutilisés |
-
----
-
-## Variables d'environnement
-
-| Variable | Fichier | Description |
-|---|---|---|
-| `VITE_API_URL` | `frontend/.env` | URL du backend appelée par le frontend |
-
----
-
-## GPU (optionnel)
-
-Pour activer le GPU NVIDIA, décommente le bloc `deploy.resources` dans `docker-compose.yml` :
-
-```yaml
-deploy:
-  resources:
-    reservations:
-      devices:
-        - driver: nvidia
-          count: 1
-          capabilities: [gpu]
-```
-
----
-
-## API — Routes disponibles
-
-| Méthode | Route | Description |
-|---|---|---|
-| `GET` | `/` | Santé de l'API |
-| `GET` | `/voice-status` | Vérifie si une voix de référence existe |
-| `POST` | `/upload-voice` | Upload de la voix de référence (converti en WAV) |
-| `POST` | `/generate` | Génère un audio à partir d'un texte |
-| `GET` | `/audio/{filename}` | Stream / télécharge un audio généré |
-| `GET` | `/share/{filename}` | Métadonnées publiques (utilisé par le widget) |
-| `GET` | `/test-vast` | Tag VAST de test avec pre-roll + Companion GIF |
-| `GET` | `/vast-ping` | Endpoint de tracking VAST (impression, start, skip…) |
-
-Clone ta voix et lis n'importe quel texte avec elle.  
-Stack : **FastAPI** + **Coqui XTTS v2** + **React / Vite** + **Docker**
-
----
-
-## Prérequis
-
-- [Docker](https://docs.docker.com/get-docker/) + Docker Compose
-- [Node.js 20+](https://nodejs.org/) (pour le dev frontend local)
-- Le modèle XTTS v2 téléchargé localement dans `~/.local/share/tts/`  
-  _(si absent, il sera téléchargé automatiquement au premier démarrage, ~2 GB)_
-
----
-
-## Structure du projet
-
-```
-DearVoices/
-├── docker-compose.yml        # Orchestre backend + frontend
-├── Makefile                  # Toutes les commandes (voir ci-dessous)
-├── backend/
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── main.py               # API FastAPI (upload voix, génération, stream audio)
-└── frontend/
-    ├── Dockerfile
-    ├── vite.config.js
-    ├── src/
-    │   ├── App.jsx            # Application principale
-    │   └── components/        # VoiceRecorder, TextToSpeech, AudioPlayer
-    └── widget/
-        ├── Widget.jsx         # Composant player embarquable
-        └── widget-entry.jsx   # Point d'entrée du widget IIFE
-```
-
----
-
-## Lancement rapide (Docker)
-
-```bash
-# 1. Installer les dépendances frontend (une seule fois)
-make install-frontend
-
-# 2. Builder les images Docker
-make build
-
-# 3. Lancer les services
-make up
-```
-
-| Service | URL |
-|---|---|
-| **Application** | http://localhost:3000 |
-| **API (Swagger)** | http://localhost:8000/docs |
-
----
-
-## Développement local (sans Docker)
-
-> **Sans hot reload**, `make up` suffit. Les modifications backend sont prises en compte instantanément (volume bind mount). Pour les modifications frontend, relance `make build && make up`.
-
-Si tu veux le hot reload complet (frontend rechargé instantanément à chaque modif), lance deux terminaux :
-
-```bash
-# Terminal 1 — Backend FastAPI avec hot reload
-make dev-backend
-
-# Terminal 2 — Frontend Vite avec hot reload
-make dev-frontend
-```
-
-> Le frontend sera accessible sur **http://localhost:3000** et proxifie automatiquement les appels vers le backend sur le port 8000.
-
----
-
-## Utilisation
-
-1. **Enregistre ta voix** — clique sur _Démarrer l'enregistrement_ et lis un texte pendant ~15 secondes
-2. **Tape ton texte** — choisis la langue et saisis le texte à lire
-3. **Génère l'audio** — clique sur _Générer l'audio_ et attends le résultat
-4. **Écoute / télécharge** — le player apparaît avec une barre de progression
-
-Les fichiers sont sauvegardés dans :
-- `backend/uploads/ma_voix.wav` — ta voix de référence
-- `backend/outputs/output_xxxx.wav` — les audios générés
+- `backend/uploads/ma_voix.wav` — voix de référence
+- `backend/outputs/output_xxxx.wav` — audios générés
 
 ---
 
 ## Widget embarquable
 
-Le widget est un player audio autonome intégrable sur n'importe quel site.
+Le widget est un player audio autonome intégrable sur n'importe quel site via une balise `<script>`.
+Il supporte le **VMAP** (Video Multiple Ad Playlist) avec pre-roll, mid-roll et post-roll audio, skip, tracking IAB et Companion GIF.
 
-### Générer le widget
+### Dev avec hot-reload
+
+La sandbox widget est accessible dès que `make start` tourne — pas de commande séparée :
+
+```
+http://localhost:3000/dev-widget.html
+```
+
+La page affiche 3 instances du widget :
+- Sans pub
+- Avec **VAST** seul (pre-roll uniquement)
+- Avec **VMAP** complet (pre + mid + post-roll)
+
+Pour changer l'audio testé ou l'URL pub, édite `src/widget/dev-widget-mount.jsx` :
+
+```js
+const ID   = 'output_mon_fichier.wav';        // ← nom du fichier généré
+const VAST = 'http://localhost:8000/test-vast'; // ← pre-roll seul
+const VMAP = 'http://localhost:8000/test-vmap'; // ← pre + mid + post-roll
+```
+
+### Build production
 
 ```bash
-# Build le widget (→ frontend/dist-widget/widget.iife.js)
 cd frontend && npm run build:widget
+# → frontend/dist-widget/widget.iife.js
 ```
 
 ### Intégrer sur un site
 
 ```html
-<script src="https://ton-domaine.com/widget.iife.js?id=output_xxxx.wav&api=https://ton-domaine.com:8000"></script>
+<script src="https://ton-domaine.com/widget.iife.js?id=output_xxxx.wav&api=https://ton-domaine.com:8000&vmap=https://adserver.com/tag.xml"></script>
 ```
 
-Le widget s'insère automatiquement juste après la balise `<script>`.
+**Paramètres URL disponibles :**
 
-### Tester en local
+| Paramètre | Obligatoire | Description | Exemple |
+|---|---|---|---|
+| `id` | ✅ | Nom du fichier audio généré | `output_a1b2c3.wav` |
+| `api` | ✅ | URL de base de l'API | `https://ton-domaine.com:8000` |
+| `vmap` | — | URL du tag VMAP (pub optionnelle) | `https://adserver.com/vmap.xml` |
+| `title` | — | Titre affiché dans le player | `Mon podcast` |
 
-```bash
-# Build + serveur de test sur http://localhost:4000
-make test-widget
-```
+### Fonctionnement VMAP
+
+Le hook `useVmap.js` parse le XML VMAP et orchestre automatiquement :
+
+| `timeOffset` | Type | Comportement |
+|---|---|---|
+| `start` | Pre-roll | Joue la pub **avant** le contenu, dès le 1er clic Play |
+| `50%` ou `HH:MM:SS` | Mid-roll | Pause le contenu au point donné, joue la pub, puis reprend |
+| `end` | Post-roll | Joue la pub **après** la fin du contenu |
+
+Chaque break supporte : skip (avec délai configurable), tracking IAB (impression / start / quartiles / complete / skip), et Companion GIF cliquable.
+
+### Tester les pubs en local
+
+L'API expose deux endpoints de test :
+
+| Route | Description |
+|---|---|
+| `GET /test-vast` | VAST avec pre-roll 10s + Companion GIF |
+| `GET /test-vmap` | VMAP avec pre + mid (à 50%) + post-roll, chacun 10s + Companion GIF |
+| `GET /vast-ping` | Reçoit les events de tracking (impression, start, skip, complete…) |
+
+---
+
+## API — Routes disponibles
+
+| Méthode | Route | Description |
+|---|---|---|
+| `GET` | `/` | Santé de l'API |
+| `GET` | `/voice-status` | Vérifie si une voix de référence existe |
+| `POST` | `/upload-voice` | Upload de la voix de référence (converti en WAV 22kHz mono) |
+| `POST` | `/generate` | Génère un audio à partir d'un texte (`text`, `language`) |
+| `GET` | `/audio/{filename}` | Stream / télécharge un audio généré |
+| `GET` | `/share/{filename}` | Métadonnées publiques (durée, url) — utilisé par le widget |
+| `GET` | `/test-vast` | Tag VAST de test (pre-roll + Companion) |
+| `GET` | `/test-vmap` | Tag VMAP de test (pre + mid + post-roll + Companion) |
+| `GET` | `/vast-ping` | Endpoint de tracking VAST/VMAP |
 
 ---
 
 ## Commandes disponibles
 
 ```bash
-make help              # Liste toutes les commandes
+make help   # Liste toutes les commandes
 ```
 
 | Commande | Description |
 |---|---|
-| `make build` | Build les images Docker |
-| `make up` | Lance tous les services |
-| `make down` | Arrête tous les services |
-| `make restart` | Redémarre tous les services |
-| `make rebuild` | Stop + build --no-cache + relance |
-| `make rebuild-backend` | Rebuild uniquement le backend |
-| `make logs` | Logs live de tous les services |
-| `make logs-backend` | Logs FastAPI uniquement |
-| `make logs-frontend` | Logs Nginx uniquement |
-| `make dev-backend` | FastAPI en local avec hot reload |
-| `make dev-frontend` | Vite en local avec hot reload |
-| `make dev` | Backend + frontend en parallèle |
-| `make install-frontend` | `npm install` du frontend |
-| `make test-widget` | Build + test du widget sur :4000 |
-| `make shell-backend` | Shell dans le conteneur backend |
-| `make clean` | Supprime les fichiers audio générés |
-| `make prune` | Nettoie les images/volumes Docker inutilisés |
+| `make install` | `npm install` + `pip install` (dépendances locales) |
+| `make start` | Lance toute la stack Docker en mode dev (hot-reload, port 3000 + 8000) |
+| `make stop` | Arrête tous les services Docker |
+| `make build-prod` | Build les images Docker de production |
+| `make logs` | Logs live de tous les services Docker |
+| `make check-gpu` | Vérifie si le GPU NVIDIA est détecté dans le conteneur backend |
 
 ---
 
@@ -335,17 +208,3 @@ deploy:
           count: 1
           capabilities: [gpu]
 ```
-
----
-
-## API — Routes disponibles
-
-| Méthode | Route | Description |
-|---|---|---|
-| `GET` | `/` | Santé de l'API |
-| `GET` | `/voice-status` | Vérifie si une voix de référence existe |
-| `POST` | `/upload-voice` | Upload de la voix de référence (converti en WAV) |
-| `POST` | `/generate` | Génère un audio à partir d'un texte |
-| `GET` | `/audio/{filename}` | Stream / télécharge un audio généré |
-| `GET` | `/share/{filename}` | Métadonnées publiques (utilisé par le widget) |
-

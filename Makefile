@@ -3,7 +3,7 @@ CYAN  := $(shell tput setaf 6)
 GREEN := $(shell tput setaf 2)
 RESET := $(shell tput sgr0)
 
-.PHONY: help install start dev-widget stop logs-backend check-gpu build-prod
+.PHONY: help install start stop logs check-gpu build-prod
 
 help: ## 📋 Affiche cette aide
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -28,13 +28,6 @@ start: ## 🐳 Lance l'app complète en mode DEV (Hot-reload + GPU + Vite)
 
 stop: ## 🛑 Arrête tous les services
 	docker compose down
-
-# ─────────────────────────────────────────
-# WIDGET
-# ─────────────────────────────────────────
-
-dev-widget: ## 🔥 Lance le widget en mode dev avec hot-reload (http://localhost:3000/dev-widget.html)
-	cd frontend && npm run dev:widget
 
 # ─────────────────────────────────────────
 # PRODUCTION (Build final)

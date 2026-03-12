@@ -23,10 +23,22 @@ if (elNoVast) {
   );
 }
 
-// ── Avec VAST ─────────────────────────────────────────────────────────────────
-const elWithVast = document.getElementById('widget-with-vast');
+// ── Avec VAST PRE-roll ─────────────────────────────────────────────────────────────────
+const elWithVast = document.getElementById('widget-with-pre-roll');
 if (elWithVast) {
   createRoot(elWithVast).render(
+    <Widget
+      audioUrl={`${API}/audio/${ID}`}
+      duration={0}
+      vastUrl={VAST}
+    />
+  );
+}
+
+// ── Avec VAST ALL-ROLL ─────────────────────────────────────────────────────────────────
+const elWithAllRoll = document.getElementById('widget-with-all-roll');
+if (elWithAllRoll) {
+  createRoot(elWithAllRoll).render(
     <Widget
       audioUrl={`${API}/audio/${ID}`}
       duration={0}

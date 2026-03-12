@@ -22,6 +22,7 @@ DearVoices/
 ├── backend/
 │   ├── Dockerfile
 │   ├── requirements.txt
+│   ├── ads/                       # GIFs companion pour les tests pub (servis sur /ads/*)
 │   └── main.py                   # API FastAPI
 └── frontend/
     ├── Dockerfile
@@ -29,7 +30,6 @@ DearVoices/
     ├── index.html                 # App principale
     ├── dev-widget.html            # Sandbox widget avec hot-reload
     ├── public/
-    │   └── ads/                   # GIFs companion pour les tests pub
     ├── dist/                      # Build app principale (npm run build)
     ├── dist-widget/               # Build widget IIFE (npm run build:widget)
     └── src/

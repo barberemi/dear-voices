@@ -5,6 +5,7 @@ import soundfile as sf
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydub import AudioSegment
 
 # --- PATCH PYTORCH 2.6 ---
@@ -29,8 +30,12 @@ app.add_middleware(
 
 UPLOAD_DIR = "/app/uploads"
 OUTPUT_DIR = "/app/outputs"
+ADS_DIR    = "/app/ads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(ADS_DIR, exist_ok=True)
+
+app.mount("/ads", StaticFiles(directory=ADS_DIR), name="ads")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"[DearVoices] Utilisation de : {device}")
@@ -190,7 +195,7 @@ def test_vast():
                   </Linear>
                   <Companion id="romu-gif" width="480" height="480">
                     <StaticResource creativeType="image/gif">
-                      <![CDATA[http://localhost:3000/ads/romu-dance.gif]]>
+                      <![CDATA[http://localhost:8000/ads/romu-dance.gif]]>
                     </StaticResource>
                     <CompanionClickThrough>
                       <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
@@ -241,7 +246,7 @@ def test_vmap():
                   </Linear>
                   <Companion id="romu-gif" width="480" height="480">
                     <StaticResource creativeType="image/gif">
-                      <![CDATA[http://localhost:3000/ads/romu-dance.gif]]>
+                      <![CDATA[http://localhost:8000/ads/romu-dance.gif]]>
                     </StaticResource>
                     <CompanionClickThrough>
                       <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
@@ -282,7 +287,7 @@ def test_vmap():
                   </Linear>
                   <Companion id="romu-gif" width="480" height="480">
                     <StaticResource creativeType="image/gif">
-                      <![CDATA[http://localhost:3000/ads/mathilde-yeux-rouge.gif]]>
+                      <![CDATA[http://localhost:8000/ads/mathilde-yeux-rouge.gif]]>
                     </StaticResource>
                     <CompanionClickThrough>
                       <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>
@@ -323,7 +328,7 @@ def test_vmap():
                   </Linear>
                   <Companion id="romu-gif" width="480" height="480">
                     <StaticResource creativeType="image/gif">
-                      <![CDATA[http://localhost:3000/ads/romu-dance.gif]]>
+                      <![CDATA[http://localhost:8000/ads/romu-dance.gif]]>
                     </StaticResource>
                     <CompanionClickThrough>
                       <![CDATA[https://www.youtube.com/watch?v=cDvBwePeebA]]>

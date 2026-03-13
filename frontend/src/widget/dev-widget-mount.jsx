@@ -5,10 +5,11 @@
  */
 import { createRoot } from 'react-dom/client';
 import Widget from './Widget';
-import './widget.css'; // Vite l'injecte normalement en dev (pas Shadow DOM)
+import './widget.css';
 
 const API  = 'http://localhost:8000';
-const ID   = 'output_803b790a.wav';   // ← change ici si besoin
+const ID   = 'output_803b790a.wav';
+const IDVMAP   = 'output_eb4db038.wav';
 const VAST = 'http://localhost:8000/test-vast';
 const VMAP = 'http://localhost:8000/test-vmap';
 
@@ -41,7 +42,7 @@ const elWithAllRoll = document.getElementById('widget-with-all-roll');
 if (elWithAllRoll) {
   createRoot(elWithAllRoll).render(
     <Widget
-      audioUrl={`${API}/audio/${ID}`}
+      audioUrl={`${API}/audio/${IDVMAP}`}
       duration={0}
       vmapUrl={VMAP}
     />
